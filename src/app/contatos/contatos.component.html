@@ -5,31 +5,31 @@
 <form [formGroup]="formGroupContato">
     <div class="mb-3">
       <label for="name" class="form-label">Nome:</label>
-      <input type="name" class="form-control" id="nameInput">      
+      <input type="name" class="form-control" id="name" formControlName="name">      
     </div>
     <div class="mb-3">
       <label for="email" class="form-label">Email:</label>
-      <input type="email" class="form-control" id="emailInput">
+      <input type="email" class="form-control" id="email" formControlName="email">
     </div>
     <div class="mb-3">
       <label for="telefone" class="form-label">Telefone:</label>
-      <input type="tel" class="form-control" id="telefoneInput">
+      <input type="tel" class="form-control" id="telefone" formControlName="telefone">
     </div>
     <div class="mb-3">
       <label for="endereço" class="form-label">Endereço:</label>
-      <input type="address" class="form-control" id="endereçoInput">
+      <input type="address" class="form-control" id="endereço" formControlName="endereço">
     </div>
     <div class="mb-3">
       <label for="cidade" class="form-label">Cidade:</label>
-      <input type="city" class="form-control" id="cidadeInput">
+      <input type="city" class="form-control" id="cidade" formControlName="cidade">
     </div>
     <div class="mb-3">
       <label for="cep" class="form-label">Cep:</label>
-      <input type="postalcode" class="form-control" id="cepInput">
+      <input type="postalcode" class="form-control" id="cep" formControlName="cep">
     </div>
     <div class="mb-3">
       <label for="estado" class="form-label">Estado:</label>
-      <input type="state" class="form-control" id="estadoInput">
+      <input type="state" class="form-control" id="estado" formControlName="estado">
     </div>
     
     <button type="save" class="btn btn-primary" (click)="save()">Salvar</button>

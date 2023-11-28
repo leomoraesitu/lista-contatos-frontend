@@ -31,7 +31,7 @@ export class ContatosComponent {
       next: (contatos) => (this.contatos = contatos),
     })
   }
-  
+
   save(){
     let contato = this.formGroupContato.value;
     this.contatoService.save(contato).subscribe(
