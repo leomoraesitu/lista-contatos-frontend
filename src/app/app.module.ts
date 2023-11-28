@@ -3,14 +3,18 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ContatosComponent } from './contatos/contatos.component';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ContatosComponent
   ],
   imports: [
     BrowserModule,
-    NgbModule
+    NgbModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,36 @@
+{
+  "contatos": [
+    {
+      "id": 1,
+      "name": "Leonardo de Moraes Souza",
+      "email": "leomoraesitu@hotmail.com",
+      "telefone": "11991598212",
+      "endereço": "Alameda Basalto, 146",
+      "cidade": "Itu",
+      "cep": "13311744",
+      "estado": "SP"
+    },
+
+    {
+      "id": 2,
+      "name": "Susley Fernanda Silva Rodrigues",
+      "email": "susleyf@yahoo.com.br",
+      "telefone": "11999310074",
+      "endereço": "Alameda Basalto, 146",
+      "cidade": "Itu",
+      "cep": "13311744",
+      "estado": "SP"
+    },
+
+    {
+      "id": 3,
+      "name": "Vinicius de Moraes Silva Souza",
+      "email": "viniciusdmssouza@gmail.com",
+      "telefone": "11991598212",
+      "endereço": "Alameda Basalto, 146",
+      "cidade": "Itu",
+      "cep": "13311744",
+      "estado": "SP"
+    }
+  ]
+}
