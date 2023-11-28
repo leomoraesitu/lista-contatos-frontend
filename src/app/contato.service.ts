@@ -21,4 +21,9 @@ export class ContatoService {
   save(contato: Contato): Observable<Contato>{
     return this.http.post<Contato>(this.baseUrl, contato);
   }
+
+  delete(contato: Contato):Observable<void> {
+    let url = `${this.baseUrl}/${contato.id}`;
+    return this.http.delete<void>(url);
+  }
 }

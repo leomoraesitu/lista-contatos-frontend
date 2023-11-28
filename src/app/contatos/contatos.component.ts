@@ -19,7 +19,7 @@ export class ContatosComponent {
                   name: [''],
                   email: [''],
                   telefone: [''],
-                  endereço: [''],
+                  endereco: [''],
                   cidade: [''],
                   cep: [''],
                   estado: ['']
@@ -39,6 +39,14 @@ export class ContatosComponent {
         next: contato => this.contatos.push(contato)
       }
     )
+  }
+
+  delete(contato: Contato){
+    this.contatoService.delete(contato).subscribe({
+      next: () => {
+            this.contatos = this.contatos.filter(c => c.id !== contato.id)
+        }
+    })
   }
 }
 

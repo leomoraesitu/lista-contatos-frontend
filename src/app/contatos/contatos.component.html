@@ -16,8 +16,8 @@
       <input type="tel" class="form-control" id="telefone" formControlName="telefone">
     </div>
     <div class="mb-3">
-      <label for="endereço" class="form-label">Endereço:</label>
-      <input type="address" class="form-control" id="endereço" formControlName="endereço">
+      <label for="endereco" class="form-label">Endereço:</label>
+      <input type="address" class="form-control" id="endereco" formControlName="endereco">
     </div>
     <div class="mb-3">
       <label for="cidade" class="form-label">Cidade:</label>
@@ -33,4 +33,37 @@
     </div>
     
     <button type="save" class="btn btn-primary" (click)="save()">Salvar</button>
+   
   </form> 
+
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Nome</th>
+        <th scope="col">email</th>
+        <th scope="col">Telefone</th>
+        <th scope="col">Endereço</th>
+        <th scope="col">Cidade</th>
+        <th scope="col" class="text-center">CEP</th>
+        <th scope="col" class="text-center">Estado</th>
+        <th scope="col text-center" class="text-center">Opções</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor=" let c of contatos">
+        <th scope="row">{{c.id}}</th>
+        <td>{{c.name}}</td>
+        <td>{{c.email}}</td>
+        <td>{{c.telefone}}</td>
+        <td>{{c.endereco}}</td>
+        <td class="text-center">{{c.cidade}}</td>
+        <td class="text-center">{{c.cep}}</td>
+        <td class="text-center">{{c.estado}}</td>
+        
+<th><button class="btn btn-danger me-3" (click)="delete(c)">Remover</button>
+  </th>
+      </tr>      
+    </tbody>
+  </table>

@@ -5,7 +5,7 @@
       "name": "Leonardo de Moraes Souza",
       "email": "leomoraesitu@hotmail.com",
       "telefone": "11991598212",
-      "endereço": "Alameda Basalto, 146",
+      "endereco": "Alameda Basalto, 146",
       "cidade": "Itu",
       "cep": "13311744",
       "estado": "SP"
@@ -15,7 +15,7 @@
       "name": "Susley Fernanda Silva Rodrigues",
       "email": "susleyf@yahoo.com.br",
       "telefone": "11999310074",
-      "endereço": "Alameda Basalto, 146",
+      "endereco": "Alameda Basalto, 146",
       "cidade": "Itu",
       "cep": "13311744",
       "estado": "SP"
@@ -25,36 +25,16 @@
       "name": "Vinicius de Moraes Silva Souza",
       "email": "viniciusdmssouza@gmail.com",
       "telefone": "11991598212",
-      "endereço": "Alameda Basalto, 146",
+      "endereco": "Alameda Basalto, 146",
       "cidade": "Itu",
       "cep": "13311744",
       "estado": "SP"
     },
     {
-      "name": "",
-      "email": "",
-      "telefone": "",
-      "endereço": "",
-      "cidade": "",
-      "cep": "",
-      "estado": "",
-      "id": 4
-    },
-    {
-      "name": "",
-      "email": "",
-      "telefone": "",
-      "endereço": "",
-      "cidade": "",
-      "cep": "",
-      "estado": "",
-      "id": 5
-    },
-    {
       "name": "Leonardo Raphael da Silva Rodrigues",
       "email": "leonardo.souza111@fatec.sp.gov.br",
       "telefone": "+5511991598212",
-      "endereço": "Alameda Basalto, 146",
+      "endereco": "Alameda Basalto, 146",
       "cidade": "Itu",
       "cep": "13311744",
       "estado": "São Paulo",

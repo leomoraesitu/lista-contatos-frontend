@@ -3,7 +3,7 @@ export interface Contato {
     name: string,
     email: string,
     telefone: number,
-    endereço: string,
+    endereco: string,
     cidade: string,
     cep: number,
     estado: string
