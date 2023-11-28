@@ -11,6 +11,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class ContatosComponent {
   contatos: Contato[] = [];
   formGroupContato: FormGroup;
+  isEditing: boolean = false;
+  submited: boolean = false;
+  selectedContato: Contato = {} as Contato;
 
   constructor(private contatoService: ContatoService,
               private formBuilder: FormBuilder
@@ -47,6 +50,12 @@ export class ContatosComponent {
             this.contatos = this.contatos.filter(c => c.id !== contato.id)
         }
     })
+  }
+
+  cancel() {
+    this.formGroupContato.reset();
+    this.isEditing = false;
+    this.submited = false;
   }
 }
 

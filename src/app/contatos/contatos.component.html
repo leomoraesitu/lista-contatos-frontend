@@ -7,35 +7,40 @@
       <label for="name" class="form-label">Nome:</label>
       <input type="name" class="form-control" id="name" formControlName="name">      
     </div>
-    <div class="mb-3">
+    <div class="row">
+    <div class="mb-3 col">
       <label for="email" class="form-label">Email:</label>
       <input type="email" class="form-control" id="email" formControlName="email">
     </div>
-    <div class="mb-3">
+    <div class="mb-3 col">
       <label for="telefone" class="form-label">Telefone:</label>
       <input type="tel" class="form-control" id="telefone" formControlName="telefone">
     </div>
+  </div>
     <div class="mb-3">
       <label for="endereco" class="form-label">Endereço:</label>
       <input type="address" class="form-control" id="endereco" formControlName="endereco">
     </div>
-    <div class="mb-3">
+    <div class="row">
+    <div class="mb-3 col">
       <label for="cidade" class="form-label">Cidade:</label>
       <input type="city" class="form-control" id="cidade" formControlName="cidade">
     </div>
-    <div class="mb-3">
+    <div class="mb-3 col">
       <label for="cep" class="form-label">Cep:</label>
       <input type="postalcode" class="form-control" id="cep" formControlName="cep">
     </div>
-    <div class="mb-3">
+    <div class="mb-3 col">
       <label for="estado" class="form-label">Estado:</label>
       <input type="state" class="form-control" id="estado" formControlName="estado">
     </div>
+  </div>
     
     <button type="save" class="btn btn-primary" (click)="save()">Salvar</button>
-   
+    <button class="btn btn-primary m-2"(click)="cancel()">Cancelar</button>
   </form> 
 
+  <br>
 
   <table class="table table-striped">
     <thead>
