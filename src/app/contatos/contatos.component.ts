@@ -29,6 +29,17 @@ export class ContatosComponent {
   ngOnInit(): void {
     this.contatoService.getContatos().subscribe({
       next: (contatos) => (this.contatos = contatos),
-    });
+    })
+  }
+  
+  save(){
+    let contato = this.formGroupContato.value;
+    this.contatoService.save(contato).subscribe(
+      {
+        next: contato => this.contatos.push(contato)
+      }
+    )
   }
 }
+
+

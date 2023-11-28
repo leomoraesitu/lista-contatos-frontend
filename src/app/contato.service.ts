@@ -17,4 +17,8 @@ export class ContatoService {
   getContatos():Observable<Contato[]>{
     return this.http.get<Contato[]>(this.baseUrl);
   }
+
+  save(contato: Contato): Observable<Contato>{
+    return this.http.post<Contato>(this.baseUrl, contato);
+  }
 }
