@@ -6,7 +6,7 @@
       "email": "leomoraesitu@hotmail.com",
       "telefone": "11991598212",
       "endereco": "Alameda Basalto, 146",
-      "cidade": "Itu",
+      "cidade": "Salto",
       "cep": "13311744",
       "estado": "SP"
     },
@@ -26,19 +26,9 @@
       "email": "viniciusdmssouza@gmail.com",
       "telefone": "11991598212",
       "endereco": "Alameda Basalto, 146",
-      "cidade": "Itu",
+      "cidade": "Salto",
       "cep": "13311744",
       "estado": "SP"
-    },
-    {
-      "name": "Leonardo Raphael da Silva Rodrigues",
-      "email": "leonardo.souza111@fatec.sp.gov.br",
-      "telefone": "+5511991598212",
-      "endereco": "Alameda Basalto, 146",
-      "cidade": "Itu",
-      "cep": "13311744",
-      "estado": "São Paulo",
-      "id": 6
     }
   ]
 }

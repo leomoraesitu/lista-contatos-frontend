@@ -53,7 +53,7 @@
         <th scope="col">Cidade</th>
         <th scope="col" class="text-center">CEP</th>
         <th scope="col" class="text-center">Estado</th>
-        <th scope="col text-center" class="text-center">Opções</th>
+        <th scope="col" class="text-center">Opções</th>
       </tr>
     </thead>
     <tbody>
@@ -67,8 +67,10 @@
         <td class="text-center">{{c.cep}}</td>
         <td class="text-center">{{c.estado}}</td>
         
-<th><button class="btn btn-danger me-3" (click)="delete(c)">Remover</button>
-  </th>
+        <th class="row">
+          <button class="btn btn-success col m-1" (click)="edit(c)">Editar</button>
+          <button class="btn btn-danger col m-1" (click)="delete(c)">Remover</button>
+        </th>
       </tr>      
     </tbody>
   </table>

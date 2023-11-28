@@ -36,13 +36,41 @@ export class ContatosComponent {
   }
 
   save(){
-    let contato = this.formGroupContato.value;
-    this.contatoService.save(contato).subscribe(
-      {
-        next: contato => this.contatos.push(contato)
-      }
-    )
+
+    this.submited = true;
+
+    if (this.formGroupContato.valid){ 
+
+    if (this.isEditing){
+      this.selectedContato.name = this.formGroupContato.get("name")?.value;
+      this.selectedContato.email = this.formGroupContato.get("email")?.value;
+      this.selectedContato.telefone = this.formGroupContato.get("telefone")?.value;
+      this.selectedContato.endereco = this.formGroupContato.get("endereco")?.value;
+      this.selectedContato.cidade = this.formGroupContato.get("cidade")?.value;
+      this.selectedContato.cep = this.formGroupContato.get("cep")?.value;
+      this.selectedContato.estado = this.formGroupContato.get("estado")?.value;
+
+      this.contatoService.update(this.selectedContato).subscribe({
+        next: () => {
+          this.formGroupContato.reset();
+          this.isEditing = false;
+          this.submited = false;
+          }
+        }
+      )
+    }
+    else{
+      this.contatoService.save(this.formGroupContato.value).subscribe({
+        next: (contato) => {
+          this.contatos.push(contato);
+          this.formGroupContato.reset();
+          this.submited = false;
+          }
+        }
+      )
+    }  
   }
+}
 
   delete(contato: Contato){
     this.contatoService.delete(contato).subscribe({
@@ -56,6 +84,50 @@ export class ContatosComponent {
     this.formGroupContato.reset();
     this.isEditing = false;
     this.submited = false;
+  }
+
+  edit(contato: Contato){
+    this.selectedContato = contato;
+    this.isEditing = true;
+    this.formGroupContato.setValue(
+      { 
+        "name": contato.name, 
+        "email": contato.email, 
+        "telefone": contato.telefone, 
+        "endereco": contato.endereco, 
+        "cidade": contato.cidade, 
+        "cep": contato.cep, 
+        "estado": contato.estado
+      }
+    )
+  }
+
+  get name(): any {
+      return this.formGroupContato.get("name");
+  }
+
+  get email(): any {
+    return this.formGroupContato.get("email");
+  }
+
+  get telefone(): any {
+    return this.formGroupContato.get("telefone");  
+  }
+
+  get endereco(): any {
+    return this.formGroupContato.get("endereco");
+  }
+
+  get cidade(): any {
+    return this.formGroupContato.get("cidade");
+  }
+
+  get cep(): any {
+    return this.formGroupContato.get("cep");
+  }
+
+  get estado(): any {
+    return this.formGroupContato.get("estado");
   }
 }
 
