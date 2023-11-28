@@ -1,3 +1,36 @@
-<div class="d-block h4 p-2 text-bg-primary text-center">
+<div class="d-block h3 p-3 text-bg-primary text-center">
     LISTA DE CONTATOS
 </div>
+
+<form [formGroup]="formGroupContato">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nome:</label>
+      <input type="name" class="form-control" id="nameInput">      
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email:</label>
+      <input type="email" class="form-control" id="emailInput">
+    </div>
+    <div class="mb-3">
+      <label for="telefone" class="form-label">Telefone:</label>
+      <input type="tel" class="form-control" id="telefoneInput">
+    </div>
+    <div class="mb-3">
+      <label for="endereço" class="form-label">Endereço:</label>
+      <input type="address" class="form-control" id="endereçoInput">
+    </div>
+    <div class="mb-3">
+      <label for="cidade" class="form-label">Cidade:</label>
+      <input type="city" class="form-control" id="cidadeInput">
+    </div>
+    <div class="mb-3">
+      <label for="cep" class="form-label">Cep:</label>
+      <input type="postalcode" class="form-control" id="cepInput">
+    </div>
+    <div class="mb-3">
+      <label for="estado" class="form-label">Estado:</label>
+      <input type="state" class="form-control" id="estadoInput">
+    </div>
+    
+    <button type="save" class="btn btn-primary">Salvar</button>
+  </form> 

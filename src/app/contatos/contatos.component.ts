@@ -1,24 +1,34 @@
 import { Component } from '@angular/core';
 import { ContatoService } from '../contato.service';
 import { Contato } from '../Model/contato';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-contatos',
   templateUrl: './contatos.component.html',
-  styleUrls: ['./contatos.component.css']
+  styleUrls: ['./contatos.component.css'],
 })
 export class ContatosComponent {
+  contatos: Contato[] = [];
+  formGroupContato: FormGroup;
 
-contatos : Contato[] = [];
+  constructor(private contatoService: ContatoService,
+              private formBuilder: FormBuilder
+              ) {
+                this.formGroupContato = formBuilder.group({
+                  name: [''],
+                  email: [''],
+                  telefone: [''],
+                  endereço: [''],
+                  cidade: [''],
+                  cep: [''],
+                  estado: ['']
+                })
+              }
 
-constructor(private contatoService : ContatoService){}
-
-ngOnInit(): void {
-  this.contatoService.getContatos().subscribe(
-    {
-      next : contatos => this.contatos = contatos
-    }
-  )
-}
-
+  ngOnInit(): void {
+    this.contatoService.getContatos().subscribe({
+      next: (contatos) => (this.contatos = contatos),
+    });
+  }
 }
