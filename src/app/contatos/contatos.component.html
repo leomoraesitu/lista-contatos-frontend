@@ -5,34 +5,85 @@
 <form [formGroup]="formGroupContato">
     <div class="mb-3">
       <label for="name" class="form-label">Nome:</label>
-      <input type="name" class="form-control" id="name" formControlName="name">      
+      <input type="name" class="form-control" id="name" formControlName="name">
+      <small *ngIf="submited && name.hasError('required')" class="text-danger">
+        *O nome é requerido!
+      </small>
+      <small *ngIf="submited && name.hasError('minlength')" class="text-danger">
+        *O nome tem que ter no mínimo 3 caracteres!
+      </small>      
     </div>
     <div class="row">
     <div class="mb-3 col">
       <label for="email" class="form-label">Email:</label>
       <input type="email" class="form-control" id="email" formControlName="email">
+      <small *ngIf="submited && email.hasError('required')" class="text-danger">
+        *O email é requerido!
+      </small>
+      <small *ngIf="submited && email.hasError('minlength')" class="text-danger">
+        *O email tem que ter no mínimo 3 caracteres!
+      </small>
     </div>
     <div class="mb-3 col">
       <label for="telefone" class="form-label">Telefone:</label>
       <input type="tel" class="form-control" id="telefone" formControlName="telefone">
+      <small *ngIf="submited && telefone.hasError('required')" class="text-danger">
+        *O telefone é requerido!
+      </small>
+      <small *ngIf="submited && telefone.hasError('minlength')" class="text-danger">
+        *O telefone tem que ter 11 números!
+      </small>
+      <small *ngIf="submited && telefone.hasError('maxlength')" class="text-danger">
+        *O telefone não pode ter mais que 11 números!
+      </small>
     </div>
   </div>
     <div class="mb-3">
       <label for="endereco" class="form-label">Endereço:</label>
       <input type="address" class="form-control" id="endereco" formControlName="endereco">
+      <small *ngIf="submited && endereco.hasError('required')" class="text-danger">
+        *O endereco é requerido!
+      </small>
+      <small *ngIf="submited && endereco.hasError('minlength')" class="text-danger">
+        *O endereco tem que ter no mínimo 3 caracteres!
+      </small>
     </div>
     <div class="row">
     <div class="mb-3 col">
       <label for="cidade" class="form-label">Cidade:</label>
       <input type="city" class="form-control" id="cidade" formControlName="cidade">
+      <small *ngIf="submited && cidade.hasError('required')" class="text-danger">
+        *A cidade é requerida!
+      </small>
+      <small *ngIf="submited && cidade.hasError('minlength')" class="text-danger">
+        *A cidade tem que ter no mínimo 3 caracteres!
+      </small>
     </div>
     <div class="mb-3 col">
       <label for="cep" class="form-label">Cep:</label>
       <input type="postalcode" class="form-control" id="cep" formControlName="cep">
+      <small *ngIf="submited && cep.hasError('required')" class="text-danger">
+        *O CEP é requerido!
+      </small>
+      <small *ngIf="submited && cep.hasError('minlength')" class="text-danger">
+        *O CEP tem que ter 8 números!
+      </small>
+      <small *ngIf="submited && cep.hasError('maxlength')" class="text-danger">
+        *O CEP não pode ter mais que 8 números!
+      </small>
     </div>
     <div class="mb-3 col">
       <label for="estado" class="form-label">Estado:</label>
       <input type="state" class="form-control" id="estado" formControlName="estado">
+      <small *ngIf="submited && estado.hasError('required')" class="text-danger">
+        *O Estado é requerido!
+      </small>
+      <small *ngIf="submited && estado.hasError('minlength')" class="text-danger">
+        *O Estado tem que ter 2 letras!
+      </small>
+      <small *ngIf="submited && estado.hasError('maxlength')" class="text-danger">
+        *O Estado não pode ter mais que 2 letras!
+      </small>
     </div>
   </div>
     

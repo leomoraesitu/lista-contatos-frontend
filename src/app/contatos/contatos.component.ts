@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ContatoService } from '../contato.service';
 import { Contato } from '../Model/contato';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-contatos',
@@ -19,13 +19,13 @@ export class ContatosComponent {
               private formBuilder: FormBuilder
               ) {
                 this.formGroupContato = formBuilder.group({
-                  name: [''],
-                  email: [''],
-                  telefone: [''],
-                  endereco: [''],
-                  cidade: [''],
-                  cep: [''],
-                  estado: ['']
+                  name: ['', [Validators.required, Validators.minLength(3)]],
+                  email: ['', [Validators.required, Validators.minLength(3)]],
+                  telefone: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+                  endereco: ['', [Validators.required, Validators.minLength(3)]],
+                  cidade: ['', [Validators.required, Validators.minLength(3)]],
+                  cep: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
+                  estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]]
                 })
               }
 
@@ -35,6 +35,7 @@ export class ContatosComponent {
     })
   }
 
+  
   save(){
 
     this.submited = true;
