@@ -27,6 +27,7 @@
     <div class="mb-3 col">
       <label for="telefone" class="form-label">Telefone:</label>
       <input type="tel" class="form-control" id="telefone" formControlName="telefone">
+      
       <small *ngIf="submited && telefone.hasError('required')" class="text-danger">
         *O telefone é requerido!
       </small>
@@ -35,7 +36,7 @@
       </small>
       <small *ngIf="submited && telefone.hasError('maxlength')" class="text-danger">
         *O telefone não pode ter mais que 11 números!
-      </small>
+      </small>      
     </div>
   </div>
     <div class="mb-3">
@@ -60,7 +61,7 @@
       </small>
     </div>
     <div class="mb-3 col">
-      <label for="cep" class="form-label">Cep:</label>
+      <label for="cep" class="form-label">CEP:</label>
       <input type="postalcode" class="form-control" id="cep" formControlName="cep">
       <small *ngIf="submited && cep.hasError('required')" class="text-danger">
         *O CEP é requerido!
@@ -116,7 +117,7 @@
         <td>{{c.endereco}}</td>
         <td class="text-center">{{c.cidade}}</td>
         <td class="text-center">{{c.cep}}</td>
-        <td class="text-center">{{c.estado}}</td>
+        <td class="text-center">{{c.estado | uppercase }}</td>
         
         <th class="row">
           <button class="btn btn-success col m-1" (click)="edit(c)">Editar</button>

@@ -2,7 +2,7 @@ export interface Contato {
     id: number,
     name: string,
     email: string,
-    telefone: number,
+    telefone: string,
     endereco: string,
     cidade: string,
     cep: number,
