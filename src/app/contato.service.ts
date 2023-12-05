@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ContatoService {
   contatos: any;
-  baseUrl: string = "http://localhost:3000/contatos";
+  //baseUrl: string = "http://localhost:3000/contatos";
+  baseUrl: string = "http://127.0.0.1:8080/contatos";
 
   constructor(private http: HttpClient) { 
 
