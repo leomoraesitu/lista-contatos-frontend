@@ -5,6 +5,6 @@ export interface Contato {
     telefone: string,
     endereco: string,
     cidade: string,
-    cep: number,
+    cep: string,
     estado: string
 }

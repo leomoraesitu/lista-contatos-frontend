@@ -10,10 +10,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class ContatosComponent {
   contatos: Contato[] = [];
+  contatosOriginais: Contato[] = [];
   formGroupContato: FormGroup;
   isEditing: boolean = false;
   submited: boolean = false;
   selectedContato: Contato = {} as Contato;
+  filtroPesquisa: string = '';
+
 
   constructor(private contatoService: ContatoService,
               private formBuilder: FormBuilder
@@ -31,9 +34,38 @@ export class ContatosComponent {
 
   ngOnInit(): void {
     this.contatoService.getContatos().subscribe({
-      next: (contatos) => (this.contatos = contatos),
-    })
+      next: (contatos) => {
+        this.contatos = contatos;
+        this.contatosOriginais = [...contatos]; // Armazena os contatos originais
+        this.filtrarContatos();
+      },
+    });
   }
+
+  filtrarContatos() {
+    if (this.filtroPesquisa.trim() !== '') {
+      this.contatos = this.contatosOriginais.filter((contato) =>
+      this.contatoContainsSearchTerm(contato, this.filtroPesquisa)
+      );
+    } else {
+      this.contatos = [...this.contatosOriginais]; // Restaura a lista original
+    }
+  }
+
+  contatoContainsSearchTerm(contato: Contato, termo: string): boolean {
+    termo = termo.toLowerCase();
+    return (
+      contato.name.toLowerCase().includes(termo) ||
+      contato.email.toLowerCase().includes(termo) ||
+      contato.telefone.toLowerCase().includes(termo) ||
+      contato.endereco.toLowerCase().includes(termo) ||
+      contato.cidade.toLowerCase().includes(termo) ||
+      contato.cep.toLowerCase().includes(termo) ||
+      contato.estado.toLowerCase().includes(termo)
+    );
+  }
+  
+  
 
   
   save(){
@@ -71,6 +103,7 @@ export class ContatosComponent {
       )
     }  
   }
+  this.filtrarContatos();
 }
 
   delete(contato: Contato){
@@ -79,12 +112,15 @@ export class ContatosComponent {
             this.contatos = this.contatos.filter(c => c.id !== contato.id)
         }
     })
+    this.filtrarContatos();
   }
 
   cancel() {
     this.formGroupContato.reset();
     this.isEditing = false;
     this.submited = false;
+    this.filtroPesquisa = ''; // Limpar o filtro ao cancelar
+    this.filtrarContatos();
   }
 
   edit(contato: Contato){

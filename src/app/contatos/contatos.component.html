@@ -90,7 +90,20 @@
     
     <button type="save" class="btn btn-primary" (click)="save()">Salvar</button>
     <button class="btn btn-primary m-2"(click)="cancel()">Cancelar</button>
+
+    <br>
+    <br>
+
+    
   </form> 
+
+
+  <div class="mb-3">
+    <input type="search" class="form-control" id="pesquisar" [(ngModel)]="filtroPesquisa" (ngModelChange)="filtroPesquisa = $event" placeholder="Digite um nome para pesquisar">
+    <button class="btn btn-primary m-2"(click)="filtrarContatos()">Pesquisar</button>
+    <button class="btn btn-primary"(click)="cancel()">Limpar filtro</button>
+</div>
+
 
   <br>
 
@@ -109,19 +122,19 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor=" let c of contatos">
-        <th scope="row">{{c.id}}</th>
-        <td>{{c.name}}</td>
-        <td>{{c.email}}</td>
-        <td>{{c.telefone}}</td>
-        <td>{{c.endereco}}</td>
-        <td class="text-center">{{c.cidade}}</td>
-        <td class="text-center">{{c.cep}}</td>
-        <td class="text-center">{{c.estado | uppercase }}</td>
+      <tr *ngFor=" let contato of contatos">
+        <th scope="row">{{contato.id}}</th>
+        <td>{{contato.name}}</td>
+        <td>{{contato.email}}</td>
+        <td>{{contato.telefone}}</td>
+        <td>{{contato.endereco}}</td>
+        <td class="text-center">{{contato.cidade}}</td>
+        <td class="text-center">{{contato.cep}}</td>
+        <td class="text-center">{{contato.estado | uppercase }}</td>
         
         <th class="row">
-          <button class="btn btn-success col m-1" (click)="edit(c)">Editar</button>
-          <button class="btn btn-danger col m-1" (click)="delete(c)">Remover</button>
+          <button class="btn btn-success col m-1" (click)="edit(contato)">Editar</button>
+          <button class="btn btn-danger col m-1" (click)="delete(contato)">Remover</button>
         </th>
       </tr>      
     </tbody>

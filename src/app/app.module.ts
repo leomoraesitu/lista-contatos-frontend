@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ContatosComponent } from './contatos/contatos.component';
 import {HttpClientModule} from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @NgModule({
@@ -18,7 +18,8 @@ import { CommonModule } from '@angular/common';
     NgbModule,
     HttpClientModule,
     ReactiveFormsModule,
-    CommonModule     
+    CommonModule,
+    FormsModule     
   ],
   providers: [],
   bootstrap: [AppComponent]
