@@ -1,6 +1,6 @@
 # Lista de Contatos | Front-End
 
-Projeto de cadastro de contatos desenvolvido para a matéria "Linguagem de Programação WEB" da Fatec Itu.
+Projeto de cadastro de contatos desenvolvido para a matéria "Linguagem de Programação WEB" da [Fatec Itu](https://fatecitu.cps.sp.gov.br/cursos/analise-e-desenvolvimento-de-sistemas/).
 
 Este projeto foi desenvolvido utilizando o Framework [Angular CLI](https://github.com/angular/angular-cli) version 16.2.2.
 
