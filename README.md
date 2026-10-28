@@ -10,6 +10,9 @@ O projeto demonstra a integração entre interface, comunicação HTTP e persist
 - Listagem e exclusão de contatos.
 - Pesquisa por nome, email, telefone e campos do endereço.
 - Validação de campos obrigatórios e limites de tamanho nos formulários.
+- Atualização da lista após confirmação da API, preservando a pesquisa ativa.
+- Mensagens de erro e preservação dos dados do formulário quando uma escrita falha.
+- Bloqueio de ações concorrentes durante cadastro, edição e exclusão.
 
 ### Competências demonstradas
 
@@ -17,6 +20,7 @@ O projeto demonstra a integração entre interface, comunicação HTTP e persist
 - **Backend Java:** endpoints REST para operações CRUD, separação entre controllers, services e repositories e persistência com JPA.
 - **Integração full stack:** troca de dados em JSON e uso de métodos e respostas HTTP entre aplicações independentes.
 - **Ambiente de desenvolvimento:** instalação reproduzível com versões de runtime documentadas, npm e Maven Wrapper.
+- **Testes automatizados:** regressão do CRUD com respostas HTTP simuladas, incluindo falhas, requisições pendentes e comportamento dos controles.
 
 ## 💻 Tecnologias
 
@@ -25,6 +29,29 @@ O projeto demonstra a integração entre interface, comunicação HTTP e persist
 | Frontend — este repositório | Angular 16, TypeScript, RxJS, HTML, CSS e Bootstrap 5 |
 | Backend — repositório complementar | Java 21, Spring Boot 3.1.6, Spring Web, Spring Data JPA e Bean Validation |
 | Persistência local | H2 em memória e SQL para a carga inicial |
+
+## Organização do frontend
+
+O código de contatos é agrupado por funcionalidade, com os testes próximos à implementação:
+
+```text
+src/app/
+├── app.component.*
+├── app.module.ts
+└── features/contatos/
+    ├── contato.model.ts
+    ├── contato.service.ts
+    ├── contato.service.spec.ts
+    ├── contatos.component.ts
+    ├── contatos.component.html
+    ├── contatos.component.css
+    └── contatos.component.spec.ts
+```
+
+O componente coordena formulário, pesquisa e estado da tela; o serviço encapsula
+as requisições HTTP e o modelo define os dados de contato. A coleção completa é
+atualizada após sucesso da API e a lista exibida é recalculada com o filtro atual.
+A edição usa uma cópia do contato, e o PUT espera uma resposta sem corpo.
 
 ## 📷 Interface
 
@@ -115,7 +142,7 @@ npm start
 
 Acesse **http://localhost:4200**. Mantenha os dois terminais em execução; use `Ctrl+C` em cada um para encerrar.
 
-O frontend aponta diretamente para `http://127.0.0.1:8080/contatos` em `src/app/contato.service.ts`. Mantenha o backend na porta `8080`; mudar essa porta exige ajustar também a URL no frontend. Não há carregamento de `.env` configurado nem necessidade de credenciais externas para esta execução.
+O frontend aponta diretamente para `http://127.0.0.1:8080/contatos` em [contato.service.ts](src/app/features/contatos/contato.service.ts). Mantenha o backend na porta `8080`; mudar essa porta exige ajustar também a URL no frontend. Não há carregamento de `.env` configurado nem necessidade de credenciais externas para esta execução.
 
 O analytics do Angular CLI está desativado no projeto por meio de `"cli": { "analytics": false }` em `angular.json`.
 
@@ -139,6 +166,96 @@ code --install-extension angular.ng-template
 code --install-extension vscjava.vscode-java-pack
 code --install-extension vmware.vscode-boot-dev-pack
 ```
+
+O arquivo [.vscode/settings.json](.vscode/settings.json) indica o TypeScript local
+e desativa o servidor experimental. Se aparecerem erros no editor que não ocorrem
+na compilação, abra um arquivo `.ts` e use a **paleta de comandos** (`⇧⌘P`):
+`TypeScript: Select TypeScript Version` → **Use Workspace Version — 5.1.6**.
+Esses comandos pertencem ao VS Code, não ao terminal.
+
+## Testes e build
+
+Depois de instalar as dependências com `npm ci`, execute a suíte completa:
+
+```bash
+npm test -- --watch=false --browsers=ChromeHeadless
+```
+
+É necessário ter o Google Chrome instalado. Se o launcher não localizar o navegador no macOS:
+
+```bash
+export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+```
+
+Execute novamente o comando de testes após definir a variável. O Karma abre a
+porta local `9876`; ela precisa estar disponível e permitida pelo ambiente.
+Os testes simulam HTTP e não precisam dos servidores frontend ou backend rodando.
+
+Para executar apenas a regressão do componente:
+
+```bash
+npm test -- --watch=false --browsers=ChromeHeadless --include='src/app/features/contatos/contatos.component.spec.ts'
+```
+
+Para gerar o build de produção e conferir o diff:
+
+```bash
+npm run build
+git diff --check
+```
+
+O build é gerado em `dist/lista-contatos-frontend`. Na última validação em
+**28/10/2026**, os **23 testes passaram** e o build foi concluído, com dois avisos
+de seletores CSS do Bootstrap (`.form-floating>~label`). Os cenários incluem
+pesquisa após escritas, edição pendente, falhas HTTP, nova tentativa, cancelamento,
+exclusão durante edição, bloqueio de controles e contrato HTTP do serviço.
+Essa evidência não substitui uma nova execução após mudanças, nem representa
+validação ponta a ponta com o backend real.
+
+## Continuidade entre sessões
+
+O [MEMORY.md](MEMORY.md) reúne decisões, planos, validações anteriores e a próxima
+ação recomendada. O [AGENTS.md](AGENTS.md) orienta sua leitura no início das sessões.
+Confirme sempre o estado atual dos repositórios antes de usar esse histórico.
+
+Para gerar um prompt de continuidade e copiá-lo para a área de transferência no macOS:
+
+```bash
+npm run prompt:next
+```
+
+Cole no chat com `⌘V`. O script [next-action-prompt.mjs](scripts/next-action-prompt.mjs)
+lê a seção `## Próxima ação`, inclui a memória completa e acrescenta branch,
+último commit e alterações locais do frontend no momento da geração. Usa Node.js,
+Git e `pbcopy`, já disponível no macOS; substitui o conteúdo atual da área de
+transferência. Não chama serviços externos nem executa a ação recomendada.
+
+Para apenas imprimir, inclusive em plataformas sem `pbcopy`:
+
+```bash
+npm run prompt:next -- --stdout
+```
+
+Para consultar as opções:
+
+```bash
+npm run prompt:next -- --help
+```
+
+O comando npm deve ser executado na raiz deste repositório. O script também pode
+ser chamado diretamente de outro diretório usando seu caminho absoluto.
+
+Para mudar a recomendação, atualize a seção `## Próxima ação` do `MEMORY.md`.
+Depois de uma entrega, revise também o estado e as evidências da memória quando
+essa atualização for solicitada. O prompt não detecta automaticamente tarefas
+concluídas no backend; a sessão deve conferir os arquivos antes de agir.
+
+## Próximas evoluções
+
+A próxima entrega recomendada é corrigir a validação do PUT no backend com testes.
+DTOs, regras de formato dos campos, persistência durável, configuração por ambiente,
+CI e testes ponta a ponta continuam no plano de evolução descrito em
+[MEMORY.md](MEMORY.md#plano-de-evolução). São itens planejados, ainda não implementados.
 
 ## 🎬 Vídeo apresentação:
 
