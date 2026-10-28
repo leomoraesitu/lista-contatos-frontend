@@ -230,5 +230,3 @@ export class ContatosComponent {
     return this.formGroupContato.get("estado");
   }
 }
-
-
