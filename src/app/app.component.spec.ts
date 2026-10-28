@@ -1,27 +1,24 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AppComponent } from './app.component';
+import { AppModule } from './app.module';
 
 describe('AppComponent', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    declarations: [AppComponent]
-  }));
+  it('renderiza a tela de contatos e carrega a lista pela API', async () => {
+    await TestBed.configureTestingModule({
+      imports: [AppModule, HttpClientTestingModule],
+    }).compileComponents();
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'lista-contatos-frontend'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('lista-contatos-frontend');
-  });
-
-  it('should render title', () => {
+    const http = TestBed.inject(HttpTestingController);
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('lista-contatos-frontend app is running!');
+    http.expectOne('http://127.0.0.1:8080/contatos').flush([]);
+    fixture.detectChanges();
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.querySelector('app-contatos')).not.toBeNull();
+    expect(element.textContent).toContain('LISTA DE CONTATOS');
+    expect(element.querySelector('form')).not.toBeNull();
+    http.verify();
   });
 });
