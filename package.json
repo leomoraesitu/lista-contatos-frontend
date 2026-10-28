@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prompt:next": "node scripts/next-action-prompt.mjs"
   },
   "private": true,
   "dependencies": {
