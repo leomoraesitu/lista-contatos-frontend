@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ContatoService } from './contato.service';
 import { Contato } from './contato.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-contatos',
@@ -9,8 +10,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./contatos.component.css'],
 })
 export class ContatosComponent {
+  isSaving = false;
+  errorMessage = '';
+  todosContatos: Contato[] = [];
   contatos: Contato[] = [];
-  contatosOriginais: Contato[] = [];
+
   formGroupContato: FormGroup;
   isEditing: boolean = false;
   submited: boolean = false;
@@ -19,37 +23,40 @@ export class ContatosComponent {
 
 
   constructor(private contatoService: ContatoService,
-              private formBuilder: FormBuilder
-              ) {
-                this.formGroupContato = formBuilder.group({
-                  name: ['', [Validators.required, Validators.minLength(3)]],
-                  email: ['', [Validators.required, Validators.minLength(3)]],
-                  telefone: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
-                  endereco: ['', [Validators.required, Validators.minLength(3)]],
-                  cidade: ['', [Validators.required, Validators.minLength(3)]],
-                  cep: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
-                  estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]]
-                })
-              }
+    private formBuilder: FormBuilder
+  ) {
+    this.formGroupContato = formBuilder.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.minLength(3)]],
+      telefone: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+      endereco: ['', [Validators.required, Validators.minLength(3)]],
+      cidade: ['', [Validators.required, Validators.minLength(3)]],
+      cep: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
+      estado: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]]
+    })
+  }
 
   ngOnInit(): void {
     this.contatoService.getContatos().subscribe({
       next: (contatos) => {
-        this.contatos = contatos;
-        this.contatosOriginais = [...contatos]; // Armazena os contatos originais
+        this.todosContatos = [...contatos]; // Armazena todos os contatos para referência
         this.filtrarContatos();
+      },
+      error: () => {
+        this.errorMessage =
+          'Não foi possível carregar os contatos. Recarregue a página para tentar novamente.';
       },
     });
   }
 
-  filtrarContatos() {
-    if (this.filtroPesquisa.trim() !== '') {
-      this.contatos = this.contatosOriginais.filter((contato) =>
-      this.contatoContainsSearchTerm(contato, this.filtroPesquisa)
-      );
-    } else {
-      this.contatos = [...this.contatosOriginais]; // Restaura a lista original
-    }
+  filtrarContatos(): void {
+    const termo = this.filtroPesquisa.trim();
+
+    this.contatos = termo
+      ? this.todosContatos.filter((contato) =>
+        this.contatoContainsSearchTerm(contato, termo)
+      )
+      : [...this.todosContatos];
   }
 
   contatoContainsSearchTerm(contato: Contato, termo: string): boolean {
@@ -64,58 +71,109 @@ export class ContatosComponent {
       contato.estado.toLowerCase().includes(termo)
     );
   }
-  
-  
 
-  
-  save(){
 
+
+
+  save(): void {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.errorMessage = '';
     this.submited = true;
 
-    if (this.formGroupContato.valid){ 
-
-    if (this.isEditing){
-      this.selectedContato.name = this.formGroupContato.get("name")?.value;
-      this.selectedContato.email = this.formGroupContato.get("email")?.value;
-      this.selectedContato.telefone = this.formGroupContato.get("telefone")?.value;
-      this.selectedContato.endereco = this.formGroupContato.get("endereco")?.value;
-      this.selectedContato.cidade = this.formGroupContato.get("cidade")?.value;
-      this.selectedContato.cep = this.formGroupContato.get("cep")?.value;
-      this.selectedContato.estado = this.formGroupContato.get("estado")?.value;
-
-      this.contatoService.update(this.selectedContato).subscribe({
-        next: () => {
-          this.formGroupContato.reset();
-          this.isEditing = false;
-          this.submited = false;
-          }
-        }
-      )
+    if (this.formGroupContato.invalid) {
+      return;
     }
-    else{
-      this.contatoService.save(this.formGroupContato.value).subscribe({
+
+    this.isSaving = true;
+
+    if (this.isEditing) {
+      const contatoAtualizado: Contato = {
+        ...this.selectedContato,
+        ...this.formGroupContato.getRawValue(),
+      };
+
+      this.contatoService
+        .update(contatoAtualizado)
+        .pipe(finalize(() => (this.isSaving = false)))
+        .subscribe({
+          next: () => {
+            this.todosContatos = this.todosContatos.map((contato) =>
+              contato.id === contatoAtualizado.id
+                ? contatoAtualizado
+                : contato
+            );
+
+            this.filtrarContatos();
+            this.formGroupContato.reset();
+            this.isEditing = false;
+            this.submited = false;
+          },
+          error: () => {
+            this.errorMessage =
+              'Não foi possível atualizar o contato. Tente novamente.';
+          },
+        });
+
+      return;
+    }
+
+    this.contatoService
+      .save(this.formGroupContato.getRawValue())
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
         next: (contato) => {
-          this.contatos.push(contato);
+          this.todosContatos = [...this.todosContatos, contato];
+          this.filtrarContatos();
           this.formGroupContato.reset();
           this.submited = false;
-          }
-        }
-      )
-    }  
+        },
+        error: () => {
+          this.errorMessage =
+            'Não foi possível cadastrar o contato. Tente novamente.';
+        },
+      });
   }
-  this.filtrarContatos();
-}
 
-  delete(contato: Contato){
-    this.contatoService.delete(contato).subscribe({
-      next: () => {
-            this.contatos = this.contatos.filter(c => c.id !== contato.id)
-        }
-    })
-    this.filtrarContatos();
+  delete(contato: Contato): void {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.isSaving = true;
+
+    this.contatoService
+      .delete(contato)
+      .pipe(finalize(() => (this.isSaving = false)))
+      .subscribe({
+        next: () => {
+          this.todosContatos = this.todosContatos.filter(
+            (item) => item.id !== contato.id
+          );
+          if (this.isEditing && this.selectedContato.id === contato.id) {
+            this.formGroupContato.reset();
+            this.isEditing = false;
+            this.submited = false;
+            this.selectedContato = {} as Contato;
+          }
+          this.filtrarContatos();
+        },
+        error: () => {
+          this.errorMessage =
+            'Não foi possível remover o contato. Tente novamente.';
+        },
+      });
   }
 
   cancel() {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.errorMessage = '';
     this.formGroupContato.reset();
     this.isEditing = false;
     this.submited = false;
@@ -123,24 +181,29 @@ export class ContatosComponent {
     this.filtrarContatos();
   }
 
-  edit(contato: Contato){
-    this.selectedContato = contato;
+  edit(contato: Contato) {
+    if (this.isSaving) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.selectedContato = { ...contato };
     this.isEditing = true;
     this.formGroupContato.setValue(
-      { 
-        "name": contato.name, 
-        "email": contato.email, 
-        "telefone": contato.telefone, 
-        "endereco": contato.endereco, 
-        "cidade": contato.cidade, 
-        "cep": contato.cep, 
+      {
+        "name": contato.name,
+        "email": contato.email,
+        "telefone": contato.telefone,
+        "endereco": contato.endereco,
+        "cidade": contato.cidade,
+        "cep": contato.cep,
         "estado": contato.estado
       }
     )
   }
 
   get name(): any {
-      return this.formGroupContato.get("name");
+    return this.formGroupContato.get("name");
   }
 
   get email(): any {
@@ -148,7 +211,7 @@ export class ContatosComponent {
   }
 
   get telefone(): any {
-    return this.formGroupContato.get("telefone");  
+    return this.formGroupContato.get("telefone");
   }
 
   get endereco(): any {
