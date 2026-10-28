@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Contato } from './Model/contato';
+import { Contato } from './contato.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,25 +11,25 @@ export class ContatoService {
   //baseUrl: string = "http://localhost:3000/contatos";
   baseUrl: string = "http://127.0.0.1:8080/contatos";
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
 
   }
 
-  getContatos():Observable<Contato[]>{
+  getContatos(): Observable<Contato[]> {
     return this.http.get<Contato[]>(this.baseUrl);
   }
 
-  save(contato: Contato): Observable<Contato>{
+  save(contato: Contato): Observable<Contato> {
     return this.http.post<Contato>(this.baseUrl, contato);
   }
 
-  delete(contato: Contato):Observable<void> {
+  delete(contato: Contato): Observable<void> {
     let url = `${this.baseUrl}/${contato.id}`;
     return this.http.delete<void>(url);
   }
 
-  update(contato: Contato): Observable<Contato>{
-    let url = `${this.baseUrl}/${contato.id}`;
-    return this.http.put<Contato>(url, contato);
+  update(contato: Contato): Observable<void> {
+    const url = `${this.baseUrl}/${contato.id}`;
+    return this.http.put<void>(url, contato);
   }
 }
