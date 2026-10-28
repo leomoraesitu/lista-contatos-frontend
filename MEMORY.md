@@ -64,7 +64,14 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
   Logos e apresentação acadêmica removidos dos READMEs; links de vídeo preservados.
 - Frontend PR #2 incorporado à `main`: commit `06e187a`.
   https://github.com/leomoraesitu/lista-contatos-frontend/pull/2
-- Backend observado na `main`, commit `f460ffc`; apenas documentação foi alterada.
+- Frontend inclui a memória e o gerador de continuidade na `main`, commit `c80b52f` (PR #3).
+- Reconciliação documental local na branch frontend `docs/reconcile-project-state`.
+- Backend na branch `fix/contact-update-validation`, baseada na `main` atualizada
+  em `f460ffc`. Correção e testes locais, ainda sem commit, push, PR ou merge.
+- POST e PUT aplicam `@Validated` aos sete campos com `@NotBlank`; valores nulos,
+  vazios ou contendo apenas espaços retornam `422` com erros. Atualizações
+  rejeitadas preservam o registro. PUT válido mantém `200` sem corpo; payload
+  válido para ID inexistente retorna `404`. Formatos de campos continuam pendentes.
 - CRUD frontend corrigido: `todosContatos` é a fonte completa; `contatos` é a
   projeção do filtro. Escritas atualizam a coleção apenas após sucesso HTTP.
 - Edição usa cópia e substituição por ID; PUT tipado como `Observable<void>`.
@@ -76,7 +83,7 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
 
 ## Validação
 
-Última execução anterior à criação desta memória:
+Evidência histórica do frontend (28/10/2026; não reexecutada na reconciliação documental):
 - Suíte completa frontend: **23 testes passaram** em Chrome Headless.
 - `npm run build`: passou, com dois avisos existentes de seletores CSS do Bootstrap
   (`.form-floating>~label`). Não são falhas dos testes.
@@ -84,7 +91,26 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
 - Testes cobrem CRUD, filtros, HTTP pendente, falhas, nova tentativa, bloqueio de
   controles, cancelamento, exclusão durante edição, serviço HTTP e tela principal.
 - Testes usam API simulada; não houve validação completa ponta a ponta com API real.
-- Não foram executados testes do backend nesta evolução.
+
+Backend executado em 28/10/2026, na entrega de validação do PUT:
+- `bash ./mvnw test` com JDK 21: **46 testes passaram**, sem falhas ou erros.
+- São 45 casos de integração com MockMvc, aplicação Spring e H2, mais o teste
+  existente de inicialização do contexto.
+- POST e PUT: sete campos obrigatórios × três valores inválidos (nulo, vazio,
+  somente espaços), totalizando 42 casos. Verificam `422` e mensagens; POST não
+  persiste registros inválidos e PUT preserva todos os dados do registro original.
+- Três casos adicionais: POST válido (`201`, corpo e `Location`), PUT válido
+  (`200` sem corpo e dados persistidos) e PUT válido com ID inexistente (`404`).
+- Antes da correção, os 21 casos de PUT inválido falharam por retornar `404`.
+- A suíte de integração usa banco H2 separado e desativa a carga de `data.sql`.
+- `git diff --check` passou. Não houve teste ponta a ponta com o frontend.
+- Na reconciliação documental, foram consultados os relatórios dessa execução;
+  a suíte não foi reexecutada por haver apenas alterações de documentação.
+
+Comando backend (na raiz do repositório backend):
+```bash
+bash ./mvnw test
+```
 
 Comandos frontend:
 ```bash
@@ -101,7 +127,8 @@ Karma precisa abrir a porta 9876; falha `EPERM` no sandbox exige a permissão ad
 
 1. **Concluído:** bootstrap, READMEs de portfólio e organização frontend por funcionalidade.
 2. **Concluído:** consistência do CRUD frontend, tratamento de falhas e suíte de regressão.
-3. **Próxima entrega recomendada:** validar atualizações no backend com testes.
+3. **Implementado localmente, aguardando revisão e integração:** validação do PUT
+   no backend e testes HTTP de regressão; 46 testes passaram.
 4. **Pendente:** DTO de entrada sem ID, tratamento correto de erros internos,
    injeção por construtor e transações onde necessárias. Conferir compatibilidade
    antes de modificar respostas HTTP; o frontend espera PUT sem corpo.
@@ -118,27 +145,23 @@ redesign completo e hospedagem ficam fora da evolução incremental atual.
 
 ## Próxima ação
 
-Corrigir a ausência de validação no PUT do backend em uma entrega pequena com testes.
+Revisar a entrega local de validação do PUT e a documentação reconciliada.
 
-- Confirme no backend se POST ainda recebe `@Validated` e PUT não; essa foi a
-  situação observada em 2026-10-28.
-- Crie uma branch `fix/contact-update-validation` a partir da `main` atualizada,
-  preservando alterações existentes. Não execute esta tarefa na branch da memória.
-- Adicione testes HTTP com MockMvc para criar e atualizar com campos obrigatórios
-  vazios, nulos e contendo somente espaços. Espere `422` com erros e comprove que
-  uma atualização inválida não modifica o registro persistido.
-- Aplique ao PUT a validação Bean Validation já usada no cadastro. Cubra também
-  atualização válida (`200` sem corpo) e ID inexistente com payload válido (`404`).
-- Mantenha rotas, nomes dos campos, status de sucesso e payloads atuais. DTOs,
-  formatos de campos e refatoração geral de exceções ficam para outro PR.
-- Execute os testes do backend com JDK 21 via `bash ./mvnw test` e confira o diff.
-  Registre limitações reais; não confunda evidência histórica com testes executados.
-- Ao concluir, informe arquivos, resultados e próximos passos. Commit, push e PR
-  somente quando solicitados pelo usuário; inclua textos de PR e RW no GitFlow.
+- Confirme branch, diff e arquivos não rastreados nos dois repositórios. Backend:
+  `fix/contact-update-validation`; frontend: `docs/reconcile-project-state`.
+- No backend, revise `ContatoController.java`, o novo
+  `ContatoControllerIntegrationTests.java` e o README. A correção já foi aplicada;
+  não a implemente novamente. No frontend, revise README e esta memória.
+- Os 46 testes do backend passaram antes das alterações exclusivamente documentais.
+  Se houver novas mudanças de código, execute `bash ./mvnw test` com JDK 21.
+- Commit, push e PR somente quando solicitados; mantenha entregas separadas por
+  repositório e forneça título, descrição e texto de RW. Não faça merge automático.
+- Após a integração desta entrega, proponha uma etapa pequena do item 4 do plano:
+  DTO de entrada sem ID, preservando nomes dos campos, validação e contratos HTTP.
+  Tratamento de erros internos, injeção por construtor e transações continuam no
+  plano e devem ter escopo definido antes da implementação.
 
-Esta é uma recomendação derivada do plano; a solicitação mais recente do usuário
-tem precedência. Se o PUT já estiver corrigido, informe a evidência e proponha o
-próximo item pendente em vez de repetir a implementação.
+A solicitação mais recente do usuário tem precedência sobre esta recomendação.
 
 ## Fluxo de trabalho e continuidade
 

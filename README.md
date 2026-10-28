@@ -250,15 +250,27 @@ Depois de uma entrega, revise também o estado e as evidências da memória quan
 essa atualização for solicitada. O prompt não detecta automaticamente tarefas
 concluídas no backend; a sessão deve conferir os arquivos antes de agir.
 
-## Próximas evoluções
+## Estado da integração e próximas evoluções
 
-A próxima entrega recomendada é corrigir a validação do PUT no backend com testes.
-DTOs, regras de formato dos campos, persistência durável, configuração por ambiente,
-CI e testes ponta a ponta continuam no plano de evolução descrito em
-[MEMORY.md](MEMORY.md#plano-de-evolução). São itens planejados, ainda não implementados.
+Em 28/10/2026, a validação de campos obrigatórios no PUT foi implementada localmente
+no backend, na branch `fix/contact-update-validation`, ainda sem commit ou PR.
+POST e PUT rejeitam campos nulos, vazios ou contendo apenas espaços com `422` e
+mensagens de erro. O PUT válido mantém `200` sem corpo; payload válido para ID
+inexistente retorna `404`. Ainda não há validação de formato de email, telefone,
+CEP ou UF no backend.
+
+Na execução dessa entrega, `bash ./mvnw test` com JDK 21 aprovou **46 testes**:
+45 casos de integração com MockMvc e H2, mais o teste de contexto. A cobertura
+inclui preservação dos dados em atualizações inválidas e os contratos de sucesso.
+Consulte os [testes do backend](https://github.com/leomoraesitu/lista-contatos-backend#testes).
+Essa execução não valida o fluxo ponta a ponta pela interface.
+
+A próxima ação é revisar a entrega local e a documentação dos dois repositórios.
+Após a integração, a etapa proposta é um DTO de entrada sem ID, preservando os
+contratos HTTP. Regras de formato, tratamento de erros internos, persistência
+durável, configuração por ambiente, CI e testes ponta a ponta continuam no plano
+em [MEMORY.md](MEMORY.md#plano-de-evolução).
 
 ## 🎬 Vídeo apresentação:
 
 [<img src="https://github.com/leomoraesitu/lista-contatos-frontend/assets/128606856/2e34b104-704b-4071-b5f7-09912d59c7f2" width="300">](https://fatecspgov-my.sharepoint.com/:v:/g/personal/leonardo_souza111_fatec_sp_gov_br/EUp1ie-4dh5BtpeXh8RrRlQBP80T7IlbTXLM2Qh7ni_kWw?e=JxYh4E)
-
-
