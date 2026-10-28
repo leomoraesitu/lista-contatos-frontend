@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ContatoService } from '../contato.service';
-import { Contato } from '../Model/contato';
+import { ContatoService } from './contato.service';
+import { Contato } from './contato.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
