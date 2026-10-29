@@ -34,9 +34,9 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
   componente, template, estilos e testes juntos.
 - Componente coordena formulário, pesquisa, coleção completa e estados da tela.
   Serviço executa HTTP; modelo define `Contato`. Sem NgRx ou camadas adicionais.
-- Backend Java 21, Spring Boot 3.1.6, Spring Data JPA e H2 em memória;
-  organização controller → service → repository. No checkout local, POST e PUT
-  recebem o record `dto.ContatoRequest`, convertido para entidade no controller.
+- Backend Java 21, Spring Boot 4.1.2, Spring Data JPA e H2 em memória;
+  organização controller → service → repository, com injeção por construtor no
+  controller e no serviço. POST e PUT recebem o record `dto.ContatoRequest`, convertido para entidade no controller.
   O DTO contém os sete campos de entrada com `@NotBlank` e ignora explicitamente
   `id`; as validações da entidade foram mantidas. POST gera o ID e PUT usa o da URL.
 - API em `http://127.0.0.1:8080/contatos`; URL fixa no serviço Angular.
@@ -70,11 +70,23 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
 - Frontend inclui a memória e o gerador de continuidade na `main`, commit `c80b52f` (PR #3).
 - Reconciliação documental anterior integrada à `main` frontend em `ef6e2b4` (PR #4).
 - Validação do PUT integrada à `main` backend em `74a689f` (PR #2).
-- Backend na branch `refactor/contact-input-dto`, baseada em `74a689f`: DTO,
-  adaptação do controller e novos testes locais, revisados, sem commit, push ou PR.
-  Alterações do serviço são apenas de formatação; suas assinaturas foram preservadas.
-- Reconciliação documental desta etapa na branch frontend `docs/reconcile-contact-dto`;
-  README do backend atualizado na própria branch do DTO. Sem commit ou push.
+- DTO integrado à `main` backend em `8435497` (PR #3); documentação reconciliada
+  integrada à `main` frontend em `9c065f0` (PR #5).
+- Backend contém o commit `39c1d52`: Spring Boot 4.1.2, injeção por construtor
+  no controller e serviço, Jackson 3 e adaptação dos testes ao Spring Web MVC.
+  O agente Mockito é carregado pelo Maven na JVM de testes.
+- Backend na branch `fix/contact-persistence-errors`, com alterações locais sem
+  commit no serviço e advice e dois novos arquivos de testes ainda não rastreados.
+  `ContatoService.update()` mantém o tratamento de contato inexistente e não
+  converte mais exceções genéricas em `EntityNotFoundException`.
+- O advice trata `DataAccessException` com `StandardError`: status `500`, error
+  `Internal Server Error`, message `Não foi possível concluir a operação.`,
+  `timeStamp` e `path`. Registra a exceção completa no servidor com mensagem fixa,
+  sem incluir o corpo da requisição na mensagem de log. A resposta não usa a
+  mensagem interna da exceção.
+- Reconciliação documental atual na branch frontend
+  `docs/reconcile-persistence-errors`; README backend atualizado na própria
+  branch da correção. Sem commit, push ou merge nesta etapa.
 - POST e PUT aplicam `@Validated` aos sete campos com `@NotBlank`; valores nulos,
   vazios ou contendo apenas espaços retornam `422` com erros. Atualizações
   rejeitadas preservam o registro. PUT válido mantém `200` sem corpo; payload
@@ -99,25 +111,29 @@ Evidência histórica do frontend (28/10/2026; não reexecutada na reconciliaç�
   controles, cancelamento, exclusão durante edição, serviço HTTP e tela principal.
 - Testes usam API simulada; não houve validação completa ponta a ponta com API real.
 
-Backend executado em 28/10/2026, na revisão da entrega do DTO:
-- `bash ./mvnw test` com JDK 21: **62 testes passaram**, sem falhas, erros ou ignorados.
-- São 61 casos de integração com MockMvc, aplicação Spring e H2, mais o teste
-  existente de inicialização do contexto.
-- Os 46 testes anteriores foram preservados: 42 casos de campos nulos, vazios ou
-  contendo somente espaços em POST/PUT e três contratos de sucesso/recurso
-  inexistente, além do teste de contexto.
-- Novos casos: POST com ID existente no corpo gera outro ID e preserva o original;
-  PUT com IDs divergentes atualiza somente o contato da URL; sete campos omitidos
-  em POST e PUT totalizam mais 14 casos com `422` e sem persistência indevida.
-- POST mantém `201`, corpo e `Location`; PUT mantém `200` sem corpo; payload
-  válido para ID inexistente mantém `404`.
-- A suíte de integração usa banco H2 separado e desativa a carga de `data.sql`.
-- Antes da correção já integrada do PUT, os 21 casos de atualização inválida
-  falhavam por retornar `404`; isso é histórico, não o resultado atual.
+Backend executado em 28/10/2026, após a implementação do tratamento de persistência:
+- `bash ./mvnw test` com JDK 21: **66 testes passaram**, sem falhas, erros ou ignorados.
+- 61 casos de integração com MockMvc, contexto Spring e H2, um teste de contexto,
+  dois testes unitários do serviço e dois testes HTTP com MockMvc standalone.
+- Os testes unitários usam repositório simulado: falha no save propaga a mesma
+  instância da exceção; contato inexistente mantém `EntityNotFoundException`
+  e não tenta gravar.
+- Os testes HTTP usam controller, serviço e advice reais e repositório simulado:
+  POST e PUT com falha no save retornam `500`, mensagem genérica, horário e caminho,
+  sem expor a mensagem interna simulada, SQL simulado ou campos trace/exception.
+  Eles não simulam uma indisponibilidade real do banco nem verificam o log automaticamente.
+- Contratos anteriores preservados: POST `201`, corpo e `Location`; PUT válido
+  `200` sem corpo e atualização persistida; ID inexistente com payload válido `404`.
+- Os 21 casos de PUT com campos nulos, vazios ou somente espaços continuam com
+  `422` e registro preservado; campos omitidos e identificadores no corpo também
+  continuam cobertos pela suíte de integração.
+- A suíte H2 usa banco separado e desativa a carga de `data.sql`.
 - Na reconciliação documental foram conferidos os relatórios dessa execução;
-  os testes não foram repetidos por haver apenas mudanças de documentação.
-- Não houve teste ponta a ponta com o frontend. Conferir `git diff --check`
-  nos dois repositórios após qualquer nova edição.
+  a suíte não foi repetida porque não houve novas alterações de código.
+- `git diff --check` passou nos dois repositórios após as edições documentais.
+- O gerador de continuidade foi executado com `--stdout` e passou a recomendar
+  a revisão da entrega de persistência, sem recomendar recriar o DTO.
+- Não houve teste ponta a ponta com o frontend.
 
 Comando backend (na raiz do repositório backend):
 ```bash
@@ -140,10 +156,11 @@ Karma precisa abrir a porta 9876; falha `EPERM` no sandbox exige a permissão ad
 1. **Concluído:** bootstrap, READMEs de portfólio e organização frontend por funcionalidade.
 2. **Concluído:** consistência do CRUD frontend, tratamento de falhas e suíte de regressão.
 3. **Concluído:** validação do PUT e testes HTTP de regressão integrados ao backend.
-4. **Implementado localmente, revisado e aguardando integração:** DTO de entrada
-   sem ID, com contratos preservados e 62 testes aprovados. Tratamento correto de
-   erros internos, injeção por construtor e transações continuam pendentes; definir
-   uma entrega pequena antes de implementá-los.
+4. **DTO integrado; tratamento de persistência implementado localmente:** DTO na
+   `main` backend em `8435497`; Spring Boot 4.1.2 e injeção por construtor no commit
+   `39c1d52`. Tratamento de `DataAccessException` com `500` e quatro novos testes
+   na branch `fix/contact-persistence-errors`, sem commit, com 66 testes aprovados.
+   Tratamento geral de erros HTTP e transações continuam pendentes.
 5. **Pendente:** regras coerentes entre cadastro e edição para email, telefone,
    CEP e UF, com mensagens por campo; CORS configurável por ambiente.
 6. **Pendente:** PostgreSQL local em Docker com volume e Flyway; H2 para testes
@@ -152,27 +169,30 @@ Karma precisa abrir a porta 9876; falha `EPERM` no sandbox exige a permissão ad
    acessibilidade, teste ponta a ponta, CI, screenshots e vídeo de demonstração.
 
 Os itens pendentes são o plano original, não funcionalidades existentes. Entregue
-em etapas pequenas. Atualização de frameworks, autenticação, múltiplos usuários,
-redesign completo e hospedagem ficam fora da evolução incremental atual.
+em etapas pequenas. Novas atualizações de frameworks, autenticação, múltiplos usuários,
+redesign completo e hospedagem ficam fora da próxima entrega. A manutenção
+para Spring Boot 4.1.2 já está no checkout, conforme registrado acima.
 
 ## Próxima ação
 
-Preparar a entrega do DTO e da documentação reconciliada para integração,
-quando commit, push e PR forem solicitados.
+Revisar e preparar a entrega do tratamento de falhas de persistência e da
+documentação reconciliada, quando commit, push e PR forem solicitados.
 
-- Confirme branch, diff e arquivos não rastreados nos dois repositórios. Backend:
-  `refactor/contact-input-dto`; frontend: `docs/reconcile-contact-dto`.
-- A implementação do DTO já foi revisada e os 62 testes passaram. Não recrie o DTO
-  nem os testes. Confirme que `dto/ContatoRequest.java`, ainda não rastreado nesta
-  revisão, seja incluído ao preparar o staging explícito da entrega backend.
-- Preserve as alterações locais do usuário no controller, serviço e testes.
-- Revise os READMEs e esta memória. Se houver novas mudanças de código, execute
-  `bash ./mvnw test` com JDK 21; documentação isolada não exige repetir a suíte.
+- Confirme branches, diffs e arquivos não rastreados: backend
+  `fix/contact-persistence-errors`; frontend `docs/reconcile-persistence-errors`.
+- Não recrie o DTO, a injeção por construtor, o handler de persistência ou os testes:
+  essas alterações já existem. Preserve o trabalho local do usuário.
+- Inclua explicitamente no staging backend, quando solicitado, os arquivos
+  `src/test/java/br/com/fatec/listacontatosbackend/resources/ContatoPersistenceErrorTests.java`
+  e `src/test/java/br/com/fatec/listacontatosbackend/services/ContatoServiceTests.java`,
+  ainda não rastreados nesta reconciliação, além do serviço, advice e README.
+- A suíte backend passou com 66 testes. Se houver novas alterações de código,
+  execute `bash ./mvnw test` com JDK 21. Documentação isolada não exige repetição.
 - Mantenha entregas separadas por repositório e forneça título, descrição e texto
   de RW quando solicitados. Não faça merge automático.
-- Após a integração, defina o escopo de uma etapa pequena para tratamento correto
-  de erros internos: o serviço ainda converte exceções genéricas em recurso não
-  encontrado. Injeção por construtor e transações continuam pendentes.
+- Após a integração, defina uma entrega pequena para transações ou para regras
+  coerentes de formato entre cadastro e edição. Não inicie essas mudanças
+  automaticamente; tratamento geral de erros HTTP também fica fora desta entrega.
 
 A solicitação mais recente do usuário tem precedência sobre esta recomendação.
 

@@ -27,7 +27,7 @@ O projeto demonstra a integração entre interface, comunicação HTTP e persist
 | Camada | Tecnologias |
 | --- | --- |
 | Frontend — este repositório | Angular 16, TypeScript, RxJS, HTML, CSS e Bootstrap 5 |
-| Backend — repositório complementar | Java 21, Spring Boot 3.1.6, Spring Web, Spring Data JPA e Bean Validation |
+| Backend — repositório complementar | Java 21, Spring Boot 4.1.2, Spring Web, Spring Data JPA e Bean Validation |
 | Persistência local | H2 em memória e SQL para a carga inicial |
 
 ## Organização do frontend
@@ -59,7 +59,7 @@ A edição usa uma cópia do contato, e o PUT espera uma resposta sem corpo.
 
 ## 🚀 Bootstrap local (macOS com Apple Silicon)
 
-O frontend usa Angular 16 e consome a API do [lista-contatos-backend](https://github.com/leomoraesitu/lista-contatos-backend), desenvolvida com Spring Boot 3.1.6. As instruções abaixo reproduzem o ambiente configurado com Homebrew e shell Zsh.
+O frontend usa Angular 16 e consome a API do [lista-contatos-backend](https://github.com/leomoraesitu/lista-contatos-backend), desenvolvida com Spring Boot 4.1.2. As instruções abaixo reproduzem o ambiente configurado com Homebrew e shell Zsh.
 
 ### Pré-requisitos
 
@@ -252,35 +252,38 @@ concluídas no backend; a sessão deve conferir os arquivos antes de agir.
 
 ## Estado da integração e próximas evoluções
 
-A validação de campos obrigatórios no PUT já foi integrada à `main` do backend
-em `74a689f` (PR #2). A reconciliação documental anterior foi integrada à `main`
-deste frontend em `ef6e2b4` (PR #4).
+A validação do PUT foi integrada à `main` do backend em `74a689f` (PR #2),
+e o DTO de entrada em `8435497` (PR #3). A reconciliação documental anterior
+foi integrada à `main` deste frontend em `9c065f0` (PR #5).
 
-Em 28/10/2026, o backend contém uma nova entrega local na branch
-`refactor/contact-input-dto`, revisada e ainda sem commit, push ou PR. POST e PUT
-recebem o record `ContatoRequest`, com os sete campos obrigatórios e sem ID.
-O controller converte o DTO para entidade; um `id` enviado no corpo é ignorado.
-POST gera o identificador e PUT utiliza exclusivamente o identificador da URL,
-mantendo compatibilidade com o objeto enviado pelo Angular atual.
+POST e PUT recebem `ContatoRequest`, com sete campos obrigatórios; um `id`
+enviado no corpo é ignorado. POST gera o identificador e PUT usa o ID da URL.
+Campos omitidos, nulos, vazios ou contendo somente espaços retornam `422`;
+POST válido mantém `201`, corpo e `Location`; PUT válido mantém `200` sem corpo;
+payload válido para ID inexistente retorna `404`.
 
-Campos omitidos, nulos, vazios ou contendo apenas espaços retornam `422` com
-mensagens de erro. POST mantém `201`, corpo e `Location`; PUT mantém `200` sem
-corpo; payload válido para ID inexistente retorna `404`. Ainda não há validação
-de formato de email, telefone, CEP ou UF no backend.
+O checkout do backend contém o commit `39c1d52`, que atualiza Spring Boot para
+4.1.2, adota injeção por construtor no controller e no serviço e adapta os testes
+ao Jackson 3 e ao Spring Web MVC. O agente Mockito é configurado pelo Maven.
 
-Na revisão dessa entrega, `bash ./mvnw test` com JDK 21 aprovou **62 testes**:
-61 casos de integração com MockMvc e H2, mais o teste de contexto. A cobertura
-inclui campos omitidos, preservação dos dados em atualizações inválidas e uso
-correto dos identificadores, além dos contratos anteriores.
-Consulte os [testes do backend](https://github.com/leomoraesitu/lista-contatos-backend#testes).
-Essa execução não valida o fluxo ponta a ponta pela interface. Na reconciliação
-documental, os relatórios foram conferidos e os testes não foram repetidos.
+Na branch backend `fix/contact-persistence-errors`, há alterações locais ainda
+sem commit: o serviço deixa falhas de persistência propagarem e o advice trata
+`DataAccessException` com `500` e mensagem genérica. A exceção completa é registrada
+no servidor, sem incluir o corpo da requisição na mensagem de log. A resposta
+não expõe SQL nem a mensagem interna da falha simulada.
 
-A próxima ação é preparar a entrega do DTO e desta reconciliação para integração,
-quando solicitada. Tratamento de erros internos, injeção por construtor,
-transações, regras de formato, persistência durável, configuração por ambiente,
-CI e testes ponta a ponta continuam no plano em
-[MEMORY.md](MEMORY.md#plano-de-evolução).
+Em **28/10/2026**, a execução de `bash ./mvnw test` com JDK 21 aprovou
+**66 testes**: 61 casos de integração com Spring e H2, um teste de contexto,
+dois testes unitários do serviço e dois testes HTTP com MockMvc standalone e
+repositório simulado. Os contratos `200`, `404` e `422` continuam aprovados;
+os novos testes verificam propagação da exceção original e respostas `500`
+para POST e PUT. Consulte os [testes do backend](https://github.com/leomoraesitu/lista-contatos-backend#testes).
+A execução não valida o fluxo ponta a ponta pela interface Angular.
+
+A próxima ação é revisar e preparar a entrega de tratamento de persistência e
+da documentação, quando commit, push e PR forem solicitados. Transações,
+regras de formato, CORS e URL da API por ambiente, persistência durável, CI e
+testes ponta a ponta continuam no plano em [MEMORY.md](MEMORY.md#plano-de-evolução).
 
 ## 🎬 Vídeo apresentação:
 
