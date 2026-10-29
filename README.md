@@ -252,24 +252,35 @@ concluídas no backend; a sessão deve conferir os arquivos antes de agir.
 
 ## Estado da integração e próximas evoluções
 
-Em 28/10/2026, a validação de campos obrigatórios no PUT foi implementada localmente
-no backend, na branch `fix/contact-update-validation`, ainda sem commit ou PR.
-POST e PUT rejeitam campos nulos, vazios ou contendo apenas espaços com `422` e
-mensagens de erro. O PUT válido mantém `200` sem corpo; payload válido para ID
-inexistente retorna `404`. Ainda não há validação de formato de email, telefone,
-CEP ou UF no backend.
+A validação de campos obrigatórios no PUT já foi integrada à `main` do backend
+em `74a689f` (PR #2). A reconciliação documental anterior foi integrada à `main`
+deste frontend em `ef6e2b4` (PR #4).
 
-Na execução dessa entrega, `bash ./mvnw test` com JDK 21 aprovou **46 testes**:
-45 casos de integração com MockMvc e H2, mais o teste de contexto. A cobertura
-inclui preservação dos dados em atualizações inválidas e os contratos de sucesso.
+Em 28/10/2026, o backend contém uma nova entrega local na branch
+`refactor/contact-input-dto`, revisada e ainda sem commit, push ou PR. POST e PUT
+recebem o record `ContatoRequest`, com os sete campos obrigatórios e sem ID.
+O controller converte o DTO para entidade; um `id` enviado no corpo é ignorado.
+POST gera o identificador e PUT utiliza exclusivamente o identificador da URL,
+mantendo compatibilidade com o objeto enviado pelo Angular atual.
+
+Campos omitidos, nulos, vazios ou contendo apenas espaços retornam `422` com
+mensagens de erro. POST mantém `201`, corpo e `Location`; PUT mantém `200` sem
+corpo; payload válido para ID inexistente retorna `404`. Ainda não há validação
+de formato de email, telefone, CEP ou UF no backend.
+
+Na revisão dessa entrega, `bash ./mvnw test` com JDK 21 aprovou **62 testes**:
+61 casos de integração com MockMvc e H2, mais o teste de contexto. A cobertura
+inclui campos omitidos, preservação dos dados em atualizações inválidas e uso
+correto dos identificadores, além dos contratos anteriores.
 Consulte os [testes do backend](https://github.com/leomoraesitu/lista-contatos-backend#testes).
-Essa execução não valida o fluxo ponta a ponta pela interface.
+Essa execução não valida o fluxo ponta a ponta pela interface. Na reconciliação
+documental, os relatórios foram conferidos e os testes não foram repetidos.
 
-A próxima ação é revisar a entrega local e a documentação dos dois repositórios.
-Após a integração, a etapa proposta é um DTO de entrada sem ID, preservando os
-contratos HTTP. Regras de formato, tratamento de erros internos, persistência
-durável, configuração por ambiente, CI e testes ponta a ponta continuam no plano
-em [MEMORY.md](MEMORY.md#plano-de-evolução).
+A próxima ação é preparar a entrega do DTO e desta reconciliação para integração,
+quando solicitada. Tratamento de erros internos, injeção por construtor,
+transações, regras de formato, persistência durável, configuração por ambiente,
+CI e testes ponta a ponta continuam no plano em
+[MEMORY.md](MEMORY.md#plano-de-evolução).
 
 ## 🎬 Vídeo apresentação:
 

@@ -35,7 +35,10 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
 - Componente coordena formulário, pesquisa, coleção completa e estados da tela.
   Serviço executa HTTP; modelo define `Contato`. Sem NgRx ou camadas adicionais.
 - Backend Java 21, Spring Boot 3.1.6, Spring Data JPA e H2 em memória;
-  organização controller → service → repository. DTOs ainda não implementados.
+  organização controller → service → repository. No checkout local, POST e PUT
+  recebem o record `dto.ContatoRequest`, convertido para entidade no controller.
+  O DTO contém os sete campos de entrada com `@NotBlank` e ignora explicitamente
+  `id`; as validações da entidade foram mantidas. POST gera o ID e PUT usa o da URL.
 - API em `http://127.0.0.1:8080/contatos`; URL fixa no serviço Angular.
 - GET da coleção retorna array; GET por ID retorna objeto; POST retorna `201`,
   contato e `Location`; PUT retorna `200` sem corpo; DELETE retorna `204`.
@@ -65,9 +68,13 @@ caminhos. O backend é um repositório separado e pode exigir acesso adicional.
 - Frontend PR #2 incorporado à `main`: commit `06e187a`.
   https://github.com/leomoraesitu/lista-contatos-frontend/pull/2
 - Frontend inclui a memória e o gerador de continuidade na `main`, commit `c80b52f` (PR #3).
-- Reconciliação documental local na branch frontend `docs/reconcile-project-state`.
-- Backend na branch `fix/contact-update-validation`, baseada na `main` atualizada
-  em `f460ffc`. Correção e testes locais, ainda sem commit, push, PR ou merge.
+- Reconciliação documental anterior integrada à `main` frontend em `ef6e2b4` (PR #4).
+- Validação do PUT integrada à `main` backend em `74a689f` (PR #2).
+- Backend na branch `refactor/contact-input-dto`, baseada em `74a689f`: DTO,
+  adaptação do controller e novos testes locais, revisados, sem commit, push ou PR.
+  Alterações do serviço são apenas de formatação; suas assinaturas foram preservadas.
+- Reconciliação documental desta etapa na branch frontend `docs/reconcile-contact-dto`;
+  README do backend atualizado na própria branch do DTO. Sem commit ou push.
 - POST e PUT aplicam `@Validated` aos sete campos com `@NotBlank`; valores nulos,
   vazios ou contendo apenas espaços retornam `422` com erros. Atualizações
   rejeitadas preservam o registro. PUT válido mantém `200` sem corpo; payload
@@ -92,20 +99,25 @@ Evidência histórica do frontend (28/10/2026; não reexecutada na reconciliaç�
   controles, cancelamento, exclusão durante edição, serviço HTTP e tela principal.
 - Testes usam API simulada; não houve validação completa ponta a ponta com API real.
 
-Backend executado em 28/10/2026, na entrega de validação do PUT:
-- `bash ./mvnw test` com JDK 21: **46 testes passaram**, sem falhas ou erros.
-- São 45 casos de integração com MockMvc, aplicação Spring e H2, mais o teste
+Backend executado em 28/10/2026, na revisão da entrega do DTO:
+- `bash ./mvnw test` com JDK 21: **62 testes passaram**, sem falhas, erros ou ignorados.
+- São 61 casos de integração com MockMvc, aplicação Spring e H2, mais o teste
   existente de inicialização do contexto.
-- POST e PUT: sete campos obrigatórios × três valores inválidos (nulo, vazio,
-  somente espaços), totalizando 42 casos. Verificam `422` e mensagens; POST não
-  persiste registros inválidos e PUT preserva todos os dados do registro original.
-- Três casos adicionais: POST válido (`201`, corpo e `Location`), PUT válido
-  (`200` sem corpo e dados persistidos) e PUT válido com ID inexistente (`404`).
-- Antes da correção, os 21 casos de PUT inválido falharam por retornar `404`.
+- Os 46 testes anteriores foram preservados: 42 casos de campos nulos, vazios ou
+  contendo somente espaços em POST/PUT e três contratos de sucesso/recurso
+  inexistente, além do teste de contexto.
+- Novos casos: POST com ID existente no corpo gera outro ID e preserva o original;
+  PUT com IDs divergentes atualiza somente o contato da URL; sete campos omitidos
+  em POST e PUT totalizam mais 14 casos com `422` e sem persistência indevida.
+- POST mantém `201`, corpo e `Location`; PUT mantém `200` sem corpo; payload
+  válido para ID inexistente mantém `404`.
 - A suíte de integração usa banco H2 separado e desativa a carga de `data.sql`.
-- `git diff --check` passou. Não houve teste ponta a ponta com o frontend.
-- Na reconciliação documental, foram consultados os relatórios dessa execução;
-  a suíte não foi reexecutada por haver apenas alterações de documentação.
+- Antes da correção já integrada do PUT, os 21 casos de atualização inválida
+  falhavam por retornar `404`; isso é histórico, não o resultado atual.
+- Na reconciliação documental foram conferidos os relatórios dessa execução;
+  os testes não foram repetidos por haver apenas mudanças de documentação.
+- Não houve teste ponta a ponta com o frontend. Conferir `git diff --check`
+  nos dois repositórios após qualquer nova edição.
 
 Comando backend (na raiz do repositório backend):
 ```bash
@@ -127,11 +139,11 @@ Karma precisa abrir a porta 9876; falha `EPERM` no sandbox exige a permissão ad
 
 1. **Concluído:** bootstrap, READMEs de portfólio e organização frontend por funcionalidade.
 2. **Concluído:** consistência do CRUD frontend, tratamento de falhas e suíte de regressão.
-3. **Implementado localmente, aguardando revisão e integração:** validação do PUT
-   no backend e testes HTTP de regressão; 46 testes passaram.
-4. **Pendente:** DTO de entrada sem ID, tratamento correto de erros internos,
-   injeção por construtor e transações onde necessárias. Conferir compatibilidade
-   antes de modificar respostas HTTP; o frontend espera PUT sem corpo.
+3. **Concluído:** validação do PUT e testes HTTP de regressão integrados ao backend.
+4. **Implementado localmente, revisado e aguardando integração:** DTO de entrada
+   sem ID, com contratos preservados e 62 testes aprovados. Tratamento correto de
+   erros internos, injeção por construtor e transações continuam pendentes; definir
+   uma entrega pequena antes de implementá-los.
 5. **Pendente:** regras coerentes entre cadastro e edição para email, telefone,
    CEP e UF, com mensagens por campo; CORS configurável por ambiente.
 6. **Pendente:** PostgreSQL local em Docker com volume e Flyway; H2 para testes
@@ -145,21 +157,22 @@ redesign completo e hospedagem ficam fora da evolução incremental atual.
 
 ## Próxima ação
 
-Revisar a entrega local de validação do PUT e a documentação reconciliada.
+Preparar a entrega do DTO e da documentação reconciliada para integração,
+quando commit, push e PR forem solicitados.
 
 - Confirme branch, diff e arquivos não rastreados nos dois repositórios. Backend:
-  `fix/contact-update-validation`; frontend: `docs/reconcile-project-state`.
-- No backend, revise `ContatoController.java`, o novo
-  `ContatoControllerIntegrationTests.java` e o README. A correção já foi aplicada;
-  não a implemente novamente. No frontend, revise README e esta memória.
-- Os 46 testes do backend passaram antes das alterações exclusivamente documentais.
-  Se houver novas mudanças de código, execute `bash ./mvnw test` com JDK 21.
-- Commit, push e PR somente quando solicitados; mantenha entregas separadas por
-  repositório e forneça título, descrição e texto de RW. Não faça merge automático.
-- Após a integração desta entrega, proponha uma etapa pequena do item 4 do plano:
-  DTO de entrada sem ID, preservando nomes dos campos, validação e contratos HTTP.
-  Tratamento de erros internos, injeção por construtor e transações continuam no
-  plano e devem ter escopo definido antes da implementação.
+  `refactor/contact-input-dto`; frontend: `docs/reconcile-contact-dto`.
+- A implementação do DTO já foi revisada e os 62 testes passaram. Não recrie o DTO
+  nem os testes. Confirme que `dto/ContatoRequest.java`, ainda não rastreado nesta
+  revisão, seja incluído ao preparar o staging explícito da entrega backend.
+- Preserve as alterações locais do usuário no controller, serviço e testes.
+- Revise os READMEs e esta memória. Se houver novas mudanças de código, execute
+  `bash ./mvnw test` com JDK 21; documentação isolada não exige repetir a suíte.
+- Mantenha entregas separadas por repositório e forneça título, descrição e texto
+  de RW quando solicitados. Não faça merge automático.
+- Após a integração, defina o escopo de uma etapa pequena para tratamento correto
+  de erros internos: o serviço ainda converte exceções genéricas em recurso não
+  encontrado. Injeção por construtor e transações continuam pendentes.
 
 A solicitação mais recente do usuário tem precedência sobre esta recomendação.
 
